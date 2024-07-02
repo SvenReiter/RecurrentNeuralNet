@@ -14,10 +14,21 @@ public class NeuralNet {
 
      */
 
+    private List<Edge> edges;
+
     /**
-     * @param layersPerceptrons
-     * @pre <layersPerceptrons> needs to contain at least 3 elements. */
-    public NeuralNet(Func activationFunc, Func lossFunc, int... layersPerceptrons) {
+     * @param layersPerceptrons sequence of ints, a value describes the amount of perceptrons,
+     *                          the sequences values describes the amount of layers
+     * @pre <layersPerceptrons> needs to contain at least 2 elements(input-/output-layer).
+     * @post global <edges> got defined.
+     * @throws IllegalArgumentException Network needs to contain at least 2 elements(input-/output-layer).*/
+    public NeuralNet(int... layersPerceptrons)
+            throws IllegalArgumentException {
+
+        final byte TWO= 2;
+        if(layersPerceptrons.length<TWO)
+            throw new IllegalArgumentException("Network needs to contain at least 2 elements(input-/output-layer).");
+
         final byte ONE= 1, ZERO= 0;
         List<List<Perceptron>> perceptronLayers= new ArrayList<>();
         for(int l=ZERO; l< layersPerceptrons.length; ++l) {
@@ -37,15 +48,45 @@ public class NeuralNet {
                 }
             }
         }
-        System.out.println("PerceptronLayers got initialized");
+        this.edges= edges;
+
+        System.out.println("Neural Network got initialized");
+
     }
 
-    public void forwarding(Func activationFunc) {
+    /**
+     *
+     * @param activationFunc
+     * @param edges */
+    public void forwarding(Func activationFunc, List<Edge> edges, List<Float> input) {
+        for(Edge e: edges) {
+            e.to.sum= 0f;
+        }
+        System.out.println("Perceptrons sums got initialized");
 
+        for(int i=0; i<input.size(); ++i) {
+            edges.get(0).from.sum= input.get(i);
+        }
+        System.out.println("Input-Layer got initialized");
+
+        for(Edge e: edges) {
+            e.to.sum+= activationFunc.calc(e.from.sum) * e.weight;
+        }
+        System.out.println("Neural Network got forwarded");
     }
 
-    public void backpropagation(Func lossFunc) {
+    public List<Edge> getEdges() {
+        return edges;
+    }
+
+    /**
+     *
+     * @param lossFunc
+     * @param edges
+     * @param predicted */
+    public void backpropagation(Func lossFunc, List<Edge> edges, List<Float> predicted) {
         //<lossFunc> wird in der Regel bei der Optimierung des Modells verwendet,
         // um die Gewichte und Schwellenwerte anzupassen und den Fehler zu minimieren.
+        //todo
     }
 }

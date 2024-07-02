@@ -1,3 +1,3 @@
 public interface Func {
-    double calc(double ...param);
+    float calc(float ...param);
 }

@@ -1,12 +1,5 @@
 
 public class Perceptron {
+    { sum= 0f; }
     float sum;
-
-    public Perceptron() {
-        sum= 0f;
-    }
-
-    public Perceptron(float input) {
-        sum= input;
-    }
 }
