@@ -2,17 +2,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NeuralNet {
-    /*
-    Neuronale Netzwerke bestehen dabei im Prinzip immer aus den folgenden vier Komponenten:
-
-        - Einem Input Layer
-        - Mindestens einem Hidden Layer
-        - Mindestens einer Aktivierungsfunktion
-        - Einem Output Layer
-
-        - Um Werte zu summieren, muss kontextbasiert verarbeitet werden => <Perceptron>s müssen zur Laufzeit existieren!
-
-     */
 
     private final List<Edge> edges;
     private final List<List<Perceptron>> perceptronsPerLayer;
@@ -55,6 +44,15 @@ public class NeuralNet {
     }
 
     /**
+     * for testing
+     * @param edges
+     * @param perceptronsPerLayer */
+    public NeuralNet(List<Edge> edges, List<List<Perceptron>> perceptronsPerLayer) {
+        this.edges= edges;
+        this.perceptronsPerLayer= perceptronsPerLayer;
+    }
+
+    /**
      * @param activationFunc The activation function to be applied to perceptrons.
      * @param edges To not enter global address-room, on referencing the edges.
      * @param input The input values for input layers <Perceptron.sum>s. */
@@ -68,6 +66,8 @@ public class NeuralNet {
 
         for(int i=ZERO; i<input.size(); ++i) {
             perceptronsPerLayer.get(ZERO).get(i).sum= input.get(i);
+            perceptronsPerLayer.get(ZERO).get(i).output= activationFunc.calc(perceptronsPerLayer.get(ZERO).get(i).sum);
+            //todo <activationFunc>
         }
         System.out.println("Input-Layer got initialized");
 
@@ -92,5 +92,16 @@ public class NeuralNet {
     }
     public List<List<Perceptron>> getPerceptronsPerLayer() {
         return perceptronsPerLayer;
+    }
+
+    /**
+     * @pre forwarding() must have been proceeded. */
+    public List<Float> getOutput(Func activationFunc) {
+        //todo the outputlayers perceptrons sums still need to get passed to the activation function
+        final List<Float> result= new ArrayList<>();
+        for(Perceptron p: perceptronsPerLayer.get(perceptronsPerLayer.size()-1)) {
+            result.add(activationFunc.calc(p.sum));
+        }
+        return result;
     }
 }
