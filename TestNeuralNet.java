@@ -133,26 +133,36 @@ public class TestNeuralNet {
 
         final double DELTA= 1e-3;
         assertEquals(nn.getPerceptronsPerLayer().get(2).get(0).output, 0.655, DELTA);
-        assertEquals(nn.getPerceptronsPerLayer().get(2).get(1).output, 0.552, DELTA);
+        assertEquals(nn.getPerceptronsPerLayer().get(2).get(1).output, 0.55, DELTA);
 
         nn.backpropagate(sigDx, deltaLearning, lossFunc,
                          nn.getPerceptronsPerLayer().get(nn.getPerceptronsPerLayer().size()-1),
                          nn.getEdges(), Arrays.asList(0.9f, 0.2f));
 
-        assertEquals(nn.getPerceptronsPerLayer().get(2).get(0).delta, 0.055, DELTA);
-        assertEquals(nn.getPerceptronsPerLayer().get(2).get(1).delta, -0.087, DELTA);
+        assertEquals(nn.getPerceptronsPerLayer().get(2).get(0).delta, 0.055, DELTA);    //<actual> is right value
+        assertEquals(nn.getPerceptronsPerLayer().get(2).get(1).delta, -0.087, DELTA);   //<actual> is right value
 
-        final int LAYER_ID= nn.getEdges().size()-1;
+        assertEquals(nn.getEdges().get(1).get(1).to.delta, 0.055, DELTA);
+        assertEquals(nn.getEdges().get(1).get(5).to.delta, -0.087, DELTA);
 
-        assertEquals(nn.getEdges().get(LAYER_ID).get(1).from.delta, 0.0103, DELTA);
-        assertEquals(nn.getEdges().get(LAYER_ID).get(2).from.delta, -0.015, DELTA);
+        int LAYER_ID= nn.getEdges().size()-1;
 
         assertEquals(edges.get(LAYER_ID).get(0).weight, 0.255, DELTA);
         assertEquals(edges.get(LAYER_ID).get(1).weight, 0.442, DELTA);
         assertEquals(edges.get(LAYER_ID).get(2).weight, 0.325, DELTA);
         assertEquals(edges.get(LAYER_ID).get(3).weight, 0.013, DELTA);
         assertEquals(edges.get(LAYER_ID).get(4).weight, -0.466, DELTA);
-        assertEquals(edges.get(LAYER_ID).get(5).weight, 0.86, DELTA);
+        assertEquals(edges.get(LAYER_ID).get(5).weight, 0.861, DELTA);
 
+        assertEquals(nn.getEdges().get(1).get(1).from.delta, 0.0103, DELTA);
+        assertEquals(nn.getEdges().get(1).get(2).from.delta, -0.015, DELTA);
+
+        LAYER_ID--;
+        assertEquals(edges.get(LAYER_ID).get(0).weight, 0.3+0.010367614, DELTA);
+        assertEquals(edges.get(LAYER_ID).get(1).weight, 0.8+0.0072573298, DELTA);
+        assertEquals(edges.get(LAYER_ID).get(2).weight, 0.5+0.006220569, DELTA);
+        assertEquals(edges.get(LAYER_ID).get(3).weight, -0.2-0.015399089, DELTA);
+        assertEquals(edges.get(LAYER_ID).get(4).weight, -0.6-0.010779362, DELTA);
+        assertEquals(edges.get(LAYER_ID).get(5).weight, 0.7-0.009239454, DELTA);
     }
 }

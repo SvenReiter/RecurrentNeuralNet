@@ -71,7 +71,8 @@ public class NeuralNet {
         for(int i=ZERO; i<input.size(); ++i) {
             if(!perceptronsPerLayer.get(ZERO).get(i).isBias) {
                 perceptronsPerLayer.get(ZERO).get(i).sum = input.get(i);
-                perceptronsPerLayer.get(ZERO).get(i).output = activationFunc.calc(perceptronsPerLayer.get(ZERO).get(i).sum);
+//                perceptronsPerLayer.get(ZERO).get(i).output = activationFunc.calc(perceptronsPerLayer.get(ZERO).get(i).sum);
+                perceptronsPerLayer.get(ZERO).get(i).output = perceptronsPerLayer.get(ZERO).get(i).sum;
             }
         }
 
@@ -115,20 +116,47 @@ public class NeuralNet {
                     (edges.get(LAYER_ID).get(5).to.delta* edges.get(LAYER_ID).get(5).weight)
                 );
 
+        // TODO: 11.07.2024 the resulting 
+        // TODO: 12.07.2024  
+        System.out.print("weight[0]("+edges.get(LAYER_ID).get(0).weight+")+= "+edges.get(LAYER_ID).get(0).to.delta+"* "+edges.get(LAYER_ID).get(0).from.output+"  //");
+        System.out.println(edges.get(LAYER_ID).get(0).to.delta*edges.get(LAYER_ID).get(0).from.output);
         edges.get(LAYER_ID).get(0).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(0).to.delta, edges.get(LAYER_ID).get(0).from.output);
+        System.out.print("weight[1]("+edges.get(LAYER_ID).get(1).weight+")+= "+edges.get(LAYER_ID).get(1).to.delta+"* "+edges.get(LAYER_ID).get(1).from.output+"  //");
+        System.out.println(edges.get(LAYER_ID).get(1).to.delta*edges.get(LAYER_ID).get(1).from.output);
         edges.get(LAYER_ID).get(1).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(1).to.delta, edges.get(LAYER_ID).get(1).from.output);
+        System.out.print("weight[2]("+edges.get(LAYER_ID).get(2).weight+")+= "+edges.get(LAYER_ID).get(2).to.delta+"* "+edges.get(LAYER_ID).get(2).from.output+"  //");
+        System.out.println(edges.get(LAYER_ID).get(2).to.delta*edges.get(LAYER_ID).get(2).from.output);
         edges.get(LAYER_ID).get(2).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(2).to.delta, edges.get(LAYER_ID).get(2).from.output);
+        System.out.print("weight[3]("+edges.get(LAYER_ID).get(3).weight+")+= "+edges.get(LAYER_ID).get(3).to.delta+"* "+edges.get(LAYER_ID).get(3).from.output+"  //");
+        System.out.println(edges.get(LAYER_ID).get(3).to.delta*edges.get(LAYER_ID).get(3).from.output);
         edges.get(LAYER_ID).get(3).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(3).to.delta, edges.get(LAYER_ID).get(3).from.output);
+        System.out.print("weight[4]("+edges.get(LAYER_ID).get(4).weight+")+= "+edges.get(LAYER_ID).get(4).to.delta+"* "+edges.get(LAYER_ID).get(4).from.output+"  //");
+        System.out.println(edges.get(LAYER_ID).get(4).to.delta*edges.get(LAYER_ID).get(4).from.output);
         edges.get(LAYER_ID).get(4).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(4).to.delta, edges.get(LAYER_ID).get(4).from.output);
+        System.out.print("weight[5]("+edges.get(LAYER_ID).get(5).weight+")+= "+edges.get(LAYER_ID).get(5).to.delta+"* "+edges.get(LAYER_ID).get(5).from.output+"  //");
+        System.out.println(edges.get(LAYER_ID).get(5).to.delta*edges.get(LAYER_ID).get(5).from.output);
         edges.get(LAYER_ID).get(5).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(5).to.delta, edges.get(LAYER_ID).get(5).from.output);
 
         LAYER_ID--;
-
+        System.out.println();
+        // TODO: 12.07.2024 beim input ist evt output direkt summe 
+        System.out.print("weight[0]("+edges.get(LAYER_ID).get(0).weight+")+= "+edges.get(LAYER_ID).get(0).to.delta+"* "+edges.get(LAYER_ID).get(0).from.output+"  //");
+        System.out.println(edges.get(LAYER_ID).get(0).to.delta*edges.get(LAYER_ID).get(0).from.sum);
         edges.get(LAYER_ID).get(0).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(0).to.delta, edges.get(LAYER_ID).get(0).from.output);
+        System.out.print("weight[1]("+edges.get(LAYER_ID).get(1).weight+")+= "+edges.get(LAYER_ID).get(1).to.delta+"* "+edges.get(LAYER_ID).get(1).from.output+"  //");
+        System.out.println(edges.get(LAYER_ID).get(1).to.delta*edges.get(LAYER_ID).get(1).from.sum);
         edges.get(LAYER_ID).get(1).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(1).to.delta, edges.get(LAYER_ID).get(1).from.output);
+        System.out.print("weight[2]("+edges.get(LAYER_ID).get(2).weight+")+= "+edges.get(LAYER_ID).get(2).to.delta+"* "+edges.get(LAYER_ID).get(2).from.output+"  //");
+        System.out.println(edges.get(LAYER_ID).get(2).to.delta*edges.get(LAYER_ID).get(2).from.sum);
         edges.get(LAYER_ID).get(2).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(2).to.delta, edges.get(LAYER_ID).get(2).from.output);
+        System.out.print("weight[3]("+edges.get(LAYER_ID).get(3).weight+")+= "+edges.get(LAYER_ID).get(3).to.delta+"* "+edges.get(LAYER_ID).get(3).from.output+"  //");
+        System.out.println(edges.get(LAYER_ID).get(3).to.delta*edges.get(LAYER_ID).get(3).from.sum);
         edges.get(LAYER_ID).get(3).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(3).to.delta, edges.get(LAYER_ID).get(3).from.output);
+        System.out.print("weight[4]("+edges.get(LAYER_ID).get(4).weight+")+= "+edges.get(LAYER_ID).get(4).to.delta+"* "+edges.get(LAYER_ID).get(4).from.output+"  //");
+        System.out.println(edges.get(LAYER_ID).get(4).to.delta*edges.get(LAYER_ID).get(4).from.sum);
         edges.get(LAYER_ID).get(4).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(4).to.delta, edges.get(LAYER_ID).get(4).from.output);
+        System.out.print("weight[5]("+edges.get(LAYER_ID).get(5).weight+")+= "+edges.get(LAYER_ID).get(5).to.delta+"* "+edges.get(LAYER_ID).get(5).from.output+"  //");
+        System.out.println(edges.get(LAYER_ID).get(5).to.delta*edges.get(LAYER_ID).get(5).from.sum);
         edges.get(LAYER_ID).get(5).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(5).to.delta, edges.get(LAYER_ID).get(5).from.output);
     }
 
