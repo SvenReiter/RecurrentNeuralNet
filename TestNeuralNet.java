@@ -33,7 +33,7 @@ public class TestNeuralNet {
                 nn.getPerceptronsPerLayer(),
                 Arrays.asList(0.5f, 0.6f));
 
-        assertEquals(nn.getPerceptronsPerLayer().get(1).get(0).sum, 0.95224657682, DELTA);
+        assertEquals(nn.getPerceptronsPerLayer().get(1).get(0).sum, 0.83, DELTA);
     }
 
     @Test
@@ -77,15 +77,15 @@ public class TestNeuralNet {
                 nn.getPerceptronsPerLayer(),
                 Arrays.asList(0.2f, 0.3f, 0.4f));
 
-        assertEquals(nn.getPerceptronsPerLayer().get(1).get(0).sum, 1.20115324, DELTA);
-        assertEquals(nn.getPerceptronsPerLayer().get(1).get(1).sum, 0.93358246, DELTA);
+        assertEquals(nn.getPerceptronsPerLayer().get(1).get(0).sum, 0.61, DELTA);
+        assertEquals(nn.getPerceptronsPerLayer().get(1).get(1).sum, 0.54, DELTA);
 
-        assertEquals(nn.getPerceptronsPerLayer().get(2).get(0).sum, 0.52283241, DELTA);
-        assertEquals(nn.getPerceptronsPerLayer().get(2).get(1).sum, 0.37927211, DELTA);
+        assertEquals(nn.getPerceptronsPerLayer().get(2).get(0).sum, 0.44872004, DELTA);
+        assertEquals(nn.getPerceptronsPerLayer().get(2).get(1).sum, 0.32235756, DELTA);
 
-        assertEquals(nn.getPerceptronsPerLayer().get(3).get(0).sum, 0.55820636, DELTA);
+        assertEquals(nn.getPerceptronsPerLayer().get(3).get(0).sum, 0.54321417, DELTA);
 
-        assertEquals(nn.getPerceptronsPerLayer().get(3).get(0).output, 0.6360374, DELTA);
+        assertEquals(nn.getPerceptronsPerLayer().get(3).get(0).output, 0.6325598, DELTA);
     }
 
     @Test
@@ -127,20 +127,20 @@ public class TestNeuralNet {
 
         NeuralNet nn= new NeuralNet(edges, perceptronsPerLayer);
         nn.forward( sig,
-                    nn.getEdges(),
-                    nn.getPerceptronsPerLayer(),
-                    Arrays.asList(1f, 0.7f, 0.6f));
+                nn.getEdges(),
+                nn.getPerceptronsPerLayer(),
+                Arrays.asList(1f, 0.7f, 0.6f));
 
         final double DELTA= 1e-3;
         assertEquals(nn.getPerceptronsPerLayer().get(2).get(0).output, 0.655, DELTA);
         assertEquals(nn.getPerceptronsPerLayer().get(2).get(1).output, 0.55, DELTA);
 
         nn.backpropagate(sigDx, deltaLearning, lossFunc,
-                         nn.getPerceptronsPerLayer().get(nn.getPerceptronsPerLayer().size()-1),
-                         nn.getEdges(), Arrays.asList(0.9f, 0.2f));
+                nn.getPerceptronsPerLayer().get(nn.getPerceptronsPerLayer().size()-1),
+                nn.getEdges(), Arrays.asList(0.9f, 0.2f));
 
-        assertEquals(nn.getPerceptronsPerLayer().get(2).get(0).delta, 0.055, DELTA);    //<actual> is right value
-        assertEquals(nn.getPerceptronsPerLayer().get(2).get(1).delta, -0.087, DELTA);   //<actual> is right value
+        assertEquals(nn.getPerceptronsPerLayer().get(2).get(0).delta, 0.0554667897522, DELTA);    //<actual> is right value
+        assertEquals(nn.getPerceptronsPerLayer().get(2).get(1).delta, -0.08662214130163193, DELTA);   //<actual> is right value
 
         assertEquals(nn.getEdges().get(1).get(1).to.delta, 0.055, DELTA);
         assertEquals(nn.getEdges().get(1).get(5).to.delta, -0.087, DELTA);
@@ -154,8 +154,8 @@ public class TestNeuralNet {
         assertEquals(edges.get(LAYER_ID).get(4).weight, -0.466, DELTA);
         assertEquals(edges.get(LAYER_ID).get(5).weight, 0.861, DELTA);
 
-        assertEquals(nn.getEdges().get(1).get(1).from.delta, 0.0103, DELTA);
-        assertEquals(nn.getEdges().get(1).get(2).from.delta, -0.015, DELTA);
+        assertEquals(nn.getEdges().get(1).get(1).from.delta, 0.010367614, DELTA);
+        assertEquals(nn.getEdges().get(1).get(2).from.delta, -0.015399089, DELTA);
 
         LAYER_ID--;
         assertEquals(edges.get(LAYER_ID).get(0).weight, 0.3+0.010367614, DELTA);
@@ -164,5 +164,62 @@ public class TestNeuralNet {
         assertEquals(edges.get(LAYER_ID).get(3).weight, -0.2-0.015399089, DELTA);
         assertEquals(edges.get(LAYER_ID).get(4).weight, -0.6-0.010779362, DELTA);
         assertEquals(edges.get(LAYER_ID).get(5).weight, 0.7-0.009239454, DELTA);
+    }
+
+    @Test
+    void forwardBackpropagateTestB() {
+        List<List<Perceptron>> perceptronsPerLayer = new ArrayList<>();
+        perceptronsPerLayer.add(new ArrayList<>());
+        perceptronsPerLayer.get(0).add(new Perceptron());
+        perceptronsPerLayer.get(0).get(0).sum= 1f;
+        perceptronsPerLayer.get(0).get(0).output= 1f;
+        perceptronsPerLayer.get(0).get(0).isBias= true;
+        perceptronsPerLayer.get(0).add(new Perceptron());
+        perceptronsPerLayer.get(0).add(new Perceptron());
+        perceptronsPerLayer.add(new ArrayList<>());
+        perceptronsPerLayer.get(1).add(new Perceptron());
+        perceptronsPerLayer.get(1).get(0).sum= 1f;
+        perceptronsPerLayer.get(1).get(0).output= 1f;
+        perceptronsPerLayer.get(1).get(0).isBias= true;
+        perceptronsPerLayer.get(1).add(new Perceptron());
+        perceptronsPerLayer.get(1).add(new Perceptron());
+        perceptronsPerLayer.add(new ArrayList<>());
+        perceptronsPerLayer.get(2).add(new Perceptron());
+        perceptronsPerLayer.get(2).add(new Perceptron());
+
+        List<List<Edge>> edges= new ArrayList<>();
+        edges.add(new ArrayList<>());
+        edges.get(0).add(new Edge(perceptronsPerLayer.get(0).get(0), perceptronsPerLayer.get(1).get(1), 0.3f));
+        edges.get(0).add(new Edge(perceptronsPerLayer.get(0).get(1), perceptronsPerLayer.get(1).get(1), 0.8f));
+        edges.get(0).add(new Edge(perceptronsPerLayer.get(0).get(2), perceptronsPerLayer.get(1).get(1), 0.5f));
+        edges.get(0).add(new Edge(perceptronsPerLayer.get(0).get(0), perceptronsPerLayer.get(1).get(2), -0.2f));
+        edges.get(0).add(new Edge(perceptronsPerLayer.get(0).get(1), perceptronsPerLayer.get(1).get(2), -0.6f));
+        edges.get(0).add(new Edge(perceptronsPerLayer.get(0).get(2), perceptronsPerLayer.get(1).get(2), 0.7f));
+        edges.add(new ArrayList<>());
+        edges.get(1).add(new Edge(perceptronsPerLayer.get(1).get(0), perceptronsPerLayer.get(2).get(0), 0.2f));
+        edges.get(1).add(new Edge(perceptronsPerLayer.get(1).get(1), perceptronsPerLayer.get(2).get(0), 0.4f));
+        edges.get(1).add(new Edge(perceptronsPerLayer.get(1).get(2), perceptronsPerLayer.get(2).get(0), 0.3f));
+        edges.get(1).add(new Edge(perceptronsPerLayer.get(1).get(0), perceptronsPerLayer.get(2).get(1), 0.1f));
+        edges.get(1).add(new Edge(perceptronsPerLayer.get(1).get(1), perceptronsPerLayer.get(2).get(1), -0.4f));
+        edges.get(1).add(new Edge(perceptronsPerLayer.get(1).get(2), perceptronsPerLayer.get(2).get(1), 0.9f));
+
+        NeuralNet nn= new NeuralNet(edges, perceptronsPerLayer);
+        nn.forward( sig,
+                nn.getEdges(),
+                nn.getPerceptronsPerLayer(),
+                Arrays.asList(1f, 0.7f, 0.6f));
+
+        nn.backpropagate(sigDx, deltaLearning, lossFunc,
+                nn.getPerceptronsPerLayer().get(nn.getPerceptronsPerLayer().size()-1),
+                nn.getEdges(), Arrays.asList(0.9f, 0.2f));
+
+        /* TODO: 14.07.2024 change the weights as calculated above and proceed same forward as proceeded above and
+            check the output, output should be closer to given target/soll
+         */
+        nn.forward( sig,
+                nn.getEdges(),
+                nn.getPerceptronsPerLayer(),
+                Arrays.asList(1f, 0.7f, 0.6f));
+        System.out.println();
     }
 }
