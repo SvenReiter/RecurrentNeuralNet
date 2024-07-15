@@ -1,4 +1,6 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -139,8 +141,8 @@ public class TestNeuralNet {
                 nn.getPerceptronsPerLayer().get(nn.getPerceptronsPerLayer().size()-1),
                 nn.getEdges(), Arrays.asList(0.9f, 0.2f));
 
-        assertEquals(nn.getPerceptronsPerLayer().get(2).get(0).delta, 0.0554667897522, DELTA);    //<actual> is right value
-        assertEquals(nn.getPerceptronsPerLayer().get(2).get(1).delta, -0.08662214130163193, DELTA);   //<actual> is right value
+        assertEquals(nn.getPerceptronsPerLayer().get(2).get(0).delta, 0.0554667897522, DELTA);
+        assertEquals(nn.getPerceptronsPerLayer().get(2).get(1).delta, -0.08662214130163193, DELTA);
 
         assertEquals(nn.getEdges().get(1).get(1).to.delta, 0.055, DELTA);
         assertEquals(nn.getEdges().get(1).get(5).to.delta, -0.087, DELTA);
@@ -204,22 +206,27 @@ public class TestNeuralNet {
         edges.get(1).add(new Edge(perceptronsPerLayer.get(1).get(2), perceptronsPerLayer.get(2).get(1), 0.9f));
 
         NeuralNet nn= new NeuralNet(edges, perceptronsPerLayer);
+        final float INPUT_A= 0.7f, INPUT_B= 0.6f;
         nn.forward( sig,
                 nn.getEdges(),
                 nn.getPerceptronsPerLayer(),
-                Arrays.asList(1f, 0.7f, 0.6f));
+                Arrays.asList(1f, INPUT_A, INPUT_B));
 
+        final float preResult_hA= nn.getPerceptronsPerLayer().get(2).get(0).output;
+        final float preResult_hB= nn.getPerceptronsPerLayer().get(2).get(1).output;
+        final float TARGET_oA= 0.9f, TARGET_oB= 0.2f;
         nn.backpropagate(sigDx, deltaLearning, lossFunc,
                 nn.getPerceptronsPerLayer().get(nn.getPerceptronsPerLayer().size()-1),
-                nn.getEdges(), Arrays.asList(0.9f, 0.2f));
+                nn.getEdges(), Arrays.asList(TARGET_oA, TARGET_oB));
 
-        /* TODO: 14.07.2024 change the weights as calculated above and proceed same forward as proceeded above and
-            check the output, output should be closer to given target/soll
-         */
         nn.forward( sig,
                 nn.getEdges(),
                 nn.getPerceptronsPerLayer(),
-                Arrays.asList(1f, 0.7f, 0.6f));
-        System.out.println();
+                Arrays.asList(1f, INPUT_A, INPUT_B));
+
+        // tests whether trained output is closer to target than previous output
+        Assertions.assertTrue(
+    Math.abs(TARGET_oA-preResult_hA)>Math.abs(TARGET_oA-nn.getPerceptronsPerLayer().get(2).get(0).output) &&
+            Math.abs(TARGET_oB-preResult_hB)>Math.abs(TARGET_oB-nn.getPerceptronsPerLayer().get(2).get(1).output));
     }
 }

@@ -20,22 +20,22 @@ public class NeuralNet {
         if(layersPerceptrons.length<TWO)
             throw new IllegalArgumentException("Network needs to contain at least 2 elements(input-/output-layer).");
 
-        final byte ONE= 1, ZERO= 0;
+        final byte ONE= 1, O= 0;
         List<List<Perceptron>> perceptronsPerLayer= new ArrayList<>();
-        for(int l=ZERO; l< layersPerceptrons.length; ++l) {
+        for(int l=O; l< layersPerceptrons.length; ++l) {
             perceptronsPerLayer.add(new ArrayList<>());
-            for(int p=ZERO; p<layersPerceptrons[l]; ++p) {
+            for(int p=O; p<layersPerceptrons[l]; ++p) {
                 perceptronsPerLayer.get(l).add(new Perceptron());
             }
         }
         this.perceptronsPerLayer= perceptronsPerLayer;
 
         List<List<Edge>> edges= new ArrayList<>();
-        for(int l=ZERO; l< layersPerceptrons.length; ++l) {
+        for(int l=O; l< layersPerceptrons.length; ++l) {
             edges.add(new ArrayList<>());
-            for(int f=ZERO; f< layersPerceptrons[l]; ++f) {
+            for(int f=O; f< layersPerceptrons[l]; ++f) {
                 if((l+ONE)<layersPerceptrons.length) {
-                    for (int t=ZERO; t< layersPerceptrons[l+ONE]; ++t) {
+                    for (int t=O; t< layersPerceptrons[l+ONE]; ++t) {
                         edges.get(l).add(new Edge(perceptronsPerLayer.get(l).get(f), perceptronsPerLayer.get(l+ONE).get(t)));
                     }
                 }
@@ -60,18 +60,18 @@ public class NeuralNet {
      * @post every <Perceptron.output> got defined. */
     public void forward(Func activationFunc, List<List<Edge>> edges,
                         List<List<Perceptron>> perceptronsPerLayer, List<Float> input) {
-        final byte ZERO= 0;
+        final byte O= 0;
         for(List<Edge> l: edges) {
             for (Edge e : l) {
-                e.to.sum = ZERO;
-                e.to.output = ZERO;
+                e.to.sum = O;
+                e.to.output = O;
             }
         }
 
-        for(int i=ZERO; i<input.size(); ++i) {
-            if(!perceptronsPerLayer.get(ZERO).get(i).isBias) {
-                perceptronsPerLayer.get(ZERO).get(i).sum = input.get(i);
-                perceptronsPerLayer.get(ZERO).get(i).output = perceptronsPerLayer.get(ZERO).get(i).sum;
+        for(int i=O; i<input.size(); ++i) {
+            if(!perceptronsPerLayer.get(O).get(i).isBias) {
+                perceptronsPerLayer.get(O).get(i).sum = input.get(i);
+                perceptronsPerLayer.get(O).get(i).output = perceptronsPerLayer.get(O).get(i).sum;
             }
         }
 
@@ -80,7 +80,7 @@ public class NeuralNet {
                 e.to.sum+= e.from.output* e.weight;
             }
             for (Edge e : l) {
-                if(Float.compare(e.to.output, ZERO)== 0) {
+                if(Float.compare(e.to.output, O)== O) {
                     e.to.output= activationFunc.calc(e.to.sum);
                 }
             }
@@ -93,51 +93,29 @@ public class NeuralNet {
      * @param target The targeting values for output layers <Perceptron.sum>s.  */
     public void backpropagate(Func sigDerivation, Func deltaLearning, Func lossFunc, List<Perceptron> output,
                               List<List<Edge>> edges, List<Float> target) {
+        final byte O= 0, ONE= 1;
         //Calc outputlayers <delta>
-        for(int i=0; i< output.size(); ++i) {
+        for(int i=O; i< output.size(); ++i) {
             output.get(i).delta= sigDerivation.calc(output.get(i).sum)* lossFunc.calc(target.get(i), output.get(i).output);
         }
 
-        int LAYER_ID= edges.size()-1;
+        int LAYER_ID= edges.size()-ONE;
 
-        //Calc hiddenlayers <delta>
-        perceptronsPerLayer.get(LAYER_ID).get(1).delta=
-            sigDerivation.calc(perceptronsPerLayer.get(LAYER_ID).get(1).sum)*
-                (
-                    (edges.get(LAYER_ID).get(1).to.delta* edges.get(LAYER_ID).get(1).weight) +
-                    (edges.get(LAYER_ID).get(4).to.delta* edges.get(LAYER_ID).get(4).weight)
-                );
+        //Calc remaining layers <delta>
+        for(int i=edges.size()-ONE; i>(-ONE); --i) {
+            for(Edge e: edges.get(i)) {
+                e.from.delta+= e.to.delta* e.weight;  //At first <delta> gets used to sum up (prevLayerDelta*weight)s
+            }
+            for(Perceptron p: perceptronsPerLayer.get(i)) {
+                p.delta= sigDerivation.calc(p.sum)*p.delta;
+            }
+        }
 
-        perceptronsPerLayer.get(LAYER_ID).get(2).delta=
-            sigDerivation.calc(perceptronsPerLayer.get(LAYER_ID).get(2).sum)*
-                (
-                    (edges.get(LAYER_ID).get(2).to.delta* edges.get(LAYER_ID).get(2).weight) +
-                    (edges.get(LAYER_ID).get(5).to.delta* edges.get(LAYER_ID).get(5).weight)
-                );
-
-        edges.get(LAYER_ID).get(0).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(0).to.delta, edges.get(LAYER_ID).get(0).from.output);
-        edges.get(LAYER_ID).get(1).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(1).to.delta, edges.get(LAYER_ID).get(1).from.output);
-        edges.get(LAYER_ID).get(2).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(2).to.delta, edges.get(LAYER_ID).get(2).from.output);
-        edges.get(LAYER_ID).get(3).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(3).to.delta, edges.get(LAYER_ID).get(3).from.output);
-        edges.get(LAYER_ID).get(4).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(4).to.delta, edges.get(LAYER_ID).get(4).from.output);
-        edges.get(LAYER_ID).get(5).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(5).to.delta, edges.get(LAYER_ID).get(5).from.output);
-
-        LAYER_ID--;
-        edges.get(LAYER_ID).get(0).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(0).to.delta, edges.get(LAYER_ID).get(0).from.output);
-        edges.get(LAYER_ID).get(1).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(1).to.delta, edges.get(LAYER_ID).get(1).from.output);
-        edges.get(LAYER_ID).get(2).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(2).to.delta, edges.get(LAYER_ID).get(2).from.output);
-        edges.get(LAYER_ID).get(3).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(3).to.delta, edges.get(LAYER_ID).get(3).from.output);
-        edges.get(LAYER_ID).get(4).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(4).to.delta, edges.get(LAYER_ID).get(4).from.output);
-        edges.get(LAYER_ID).get(5).weight+= deltaLearning.calc(edges.get(LAYER_ID).get(5).to.delta, edges.get(LAYER_ID).get(5).from.output);
-    }
-
-    /**
-     * @param epsilon
-     * @param out
-     * @param in
-     * @post defines specific out.delta */
-    private void calcDeltaLearning(float epsilon, Perceptron out, Perceptron in) {
-        out.delta= epsilon* out.delta* in.output;
+        for(List<Edge> eL: edges) {
+            for(Edge e: eL) {
+                e.weight += deltaLearning.calc(e.to.delta, e.from.output);
+            }
+        }
     }
 
     public List<List<Edge>> getEdges() {
