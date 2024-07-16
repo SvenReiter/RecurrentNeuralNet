@@ -1,4 +1,5 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -288,5 +289,62 @@ public class TestNeuralNet {
         assertEquals(nn.getPerceptronsPerLayer().get(3).get(1).output, 0.67615, DELTA);
         assertEquals(nn.getPerceptronsPerLayer().get(3).get(2).output, 0.64658, DELTA);
         assertEquals(nn.getPerceptronsPerLayer().get(3).get(3).output, 0.67822, DELTA);
+    }
+
+    @Test
+    void biasInclusionTest() {
+        List<List<Perceptron>> perceptronsPerLayer = new ArrayList<>();
+        perceptronsPerLayer.add(new ArrayList<>());
+        perceptronsPerLayer.get(0).add(new Perceptron());
+        perceptronsPerLayer.get(0).add(new Perceptron());
+        perceptronsPerLayer.get(0).add(new Perceptron());
+        perceptronsPerLayer.add(new ArrayList<>());
+        perceptronsPerLayer.get(1).add(new Perceptron());
+        perceptronsPerLayer.get(1).add(new Perceptron());
+        perceptronsPerLayer.add(new ArrayList<>());
+        perceptronsPerLayer.get(2).add(new Perceptron());
+        perceptronsPerLayer.get(2).add(new Perceptron());
+        perceptronsPerLayer.get(2).add(new Perceptron());
+        perceptronsPerLayer.add(new ArrayList<>());
+        perceptronsPerLayer.get(3).add(new Perceptron());
+        perceptronsPerLayer.get(3).add(new Perceptron());
+
+        List<List<Edge>> edges= new ArrayList<>();
+        edges.add(new ArrayList<>());
+        edges.get(0).add(new Edge(perceptronsPerLayer.get(0).get(0), perceptronsPerLayer.get(1).get(0), 0.1f));
+        edges.get(0).add(new Edge(perceptronsPerLayer.get(0).get(0), perceptronsPerLayer.get(1).get(1), 0.2f));
+        edges.get(0).add(new Edge(perceptronsPerLayer.get(0).get(1), perceptronsPerLayer.get(1).get(0), 0.1f));
+        edges.get(0).add(new Edge(perceptronsPerLayer.get(0).get(1), perceptronsPerLayer.get(1).get(1), 0.2f));
+        edges.get(0).add(new Edge(perceptronsPerLayer.get(0).get(2), perceptronsPerLayer.get(1).get(0), 0.1f));
+        edges.get(0).add(new Edge(perceptronsPerLayer.get(0).get(2), perceptronsPerLayer.get(1).get(1), 0.3f));
+        edges.add(new ArrayList<>());
+        edges.get(1).add(new Edge(perceptronsPerLayer.get(1).get(0), perceptronsPerLayer.get(2).get(0), 0.4f));
+        edges.get(1).add(new Edge(perceptronsPerLayer.get(1).get(0), perceptronsPerLayer.get(2).get(1), 0.5f));
+        edges.get(1).add(new Edge(perceptronsPerLayer.get(1).get(0), perceptronsPerLayer.get(2).get(2), 0.3f));
+        edges.get(1).add(new Edge(perceptronsPerLayer.get(1).get(1), perceptronsPerLayer.get(2).get(0), 0.1f));
+        edges.get(1).add(new Edge(perceptronsPerLayer.get(1).get(1), perceptronsPerLayer.get(2).get(1), 0.2f));
+        edges.get(1).add(new Edge(perceptronsPerLayer.get(1).get(1), perceptronsPerLayer.get(2).get(2), 0.6f));
+        edges.add(new ArrayList<>());
+        edges.get(2).add(new Edge(perceptronsPerLayer.get(2).get(0), perceptronsPerLayer.get(3).get(0), 0.1f));
+        edges.get(2).add(new Edge(perceptronsPerLayer.get(2).get(0), perceptronsPerLayer.get(3).get(1), 0.2f));
+        edges.get(2).add(new Edge(perceptronsPerLayer.get(2).get(1), perceptronsPerLayer.get(3).get(0), 0.3f));
+        edges.get(2).add(new Edge(perceptronsPerLayer.get(2).get(1), perceptronsPerLayer.get(3).get(1), 0.3f));
+        edges.get(2).add(new Edge(perceptronsPerLayer.get(2).get(2), perceptronsPerLayer.get(3).get(0), 0.6f));
+        edges.get(2).add(new Edge(perceptronsPerLayer.get(2).get(2), perceptronsPerLayer.get(3).get(1), 0.7f));
+
+        NeuralNet nn= new NeuralNet(edges, perceptronsPerLayer);
+        nn.forward( sig,
+                    nn.getEdges(),
+                    nn.getPerceptronsPerLayer(),
+                    Arrays.asList(0.5f, 0.7f, 0.9f));
+
+        nn.addBias();
+        assertEquals(nn.getPerceptronsPerLayer().get(0).size(), 4);
+        assertTrue(nn.getPerceptronsPerLayer().get(0).get(0).isBias);
+        assertEquals(nn.getPerceptronsPerLayer().get(1).size(), 3);
+        assertTrue(nn.getPerceptronsPerLayer().get(1).get(0).isBias);
+        assertEquals(nn.getPerceptronsPerLayer().get(2).size(), 4);
+        assertTrue(nn.getPerceptronsPerLayer().get(2).get(0).isBias);
+        assertEquals(nn.getPerceptronsPerLayer().get(3).size(), 2);
     }
 }

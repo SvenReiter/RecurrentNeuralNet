@@ -3,7 +3,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NeuralNet {
-
     private final List<List<Edge>> edges;
     private final List<List<Perceptron>> perceptronsPerLayer;
 
@@ -14,12 +13,11 @@ public class NeuralNet {
      * @post global <edges> got defined.
      * @throws IllegalArgumentException Network needs to contain at least 2 elements(input-/output-layer).*/
     public NeuralNet(int... layersPerceptrons) throws IllegalArgumentException {
-        // TODO: 15.07.2024 Initialize a bias-perceptron to every layer except output-layer.
-        final byte TWO= 2;
+        final byte TWO= (byte)2;
         if(layersPerceptrons.length<TWO)
             throw new IllegalArgumentException("Network needs to contain at least 2 elements(input-/output-layer).");
 
-        final byte ONE= 1, O= 0;
+        final byte ONE= (byte)1, O= (byte)0;
         List<List<Perceptron>> perceptronsPerLayer= new ArrayList<>();
         for(int l=O; l< layersPerceptrons.length; ++l) {
             perceptronsPerLayer.add(new ArrayList<>());
@@ -44,12 +42,40 @@ public class NeuralNet {
     }
 
     /**
-     * for testing
      * @param edges  To not enter global address-room, on referencing the edges.
      * @param perceptronsPerLayer To not enter global address-room, on referencing the perceptrons. */
     public NeuralNet(List<List<Edge>> edges, List<List<Perceptron>> perceptronsPerLayer) {
         this.edges= edges;
         this.perceptronsPerLayer= perceptronsPerLayer;
+    }
+
+    /**
+     * @post Bias-perceptron got added to every layer except output layer. */
+    public void addBias() {
+        final byte ONE= (byte)1, O= (byte)0;
+        final Perceptron bias= new Perceptron();
+        bias.sum= ONE;
+        bias.output= ONE;
+        bias.isBias= true;
+        for(int l=O; l<perceptronsPerLayer.size()-ONE; ++l) {
+            perceptronsPerLayer.get(l).add(bias);
+            for(Perceptron p: perceptronsPerLayer.get(l+ONE)) {
+                if(!p.isBias) {
+                    edges.get(l).add(new Edge(bias, p));
+                }
+            }
+        }
+
+        Perceptron toSet, toRemember;
+        for(int l=O; l< perceptronsPerLayer.size()-ONE; l++) {
+            toSet= perceptronsPerLayer.get(l).get(O);
+            for(int i=O; i<perceptronsPerLayer.get(l).size()-ONE; ++i) {
+                toRemember= perceptronsPerLayer.get(l).get(i+ONE);
+                perceptronsPerLayer.get(l).set(i+ONE, toSet);
+                toSet= toRemember;
+            }
+            perceptronsPerLayer.get(l).set(O, bias);
+        }
     }
 
     /**
@@ -59,7 +85,7 @@ public class NeuralNet {
      * @post every <Perceptron.output> got defined. */
     public void forward(Func activationFunc, List<List<Edge>> edges,
                         List<List<Perceptron>> perceptronsPerLayer, List<Float> input) {
-        final byte O= 0;
+        final byte O= (byte)0;
         for(List<Edge> l: edges) {
             for (Edge e : l) {
                 e.to.sum = O;
@@ -92,7 +118,7 @@ public class NeuralNet {
      * @param target The targeting values for output layers <Perceptron.sum>s.  */
     public void backpropagate(Func sigDerivation, Func deltaLearning, Func lossFunc, List<Perceptron> output,
                               List<List<Edge>> edges, List<Float> target) {
-        final byte O= 0, ONE= 1;
+        final byte O= (byte)0, ONE= (byte)1;
         //Calc outputlayers <delta>
         for(int i=O; i< output.size(); ++i) {
             output.get(i).delta= sigDerivation.calc(output.get(i).sum)* lossFunc.calc(target.get(i), output.get(i).output);
