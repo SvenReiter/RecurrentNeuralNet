@@ -3,10 +3,13 @@ import java.util.Arrays;
 public class Start {
     public static void main(String[] args) {
         /*
+         *  Implements a test testing another 3x2x3x4 neural net;
+         *
          *  lineare Regression:= Spezialfall der Regressionsanalyse, mit dem versucht wird eine beobachtete
          *                       abhängige Variable durch eine oder mehrere unabhängige Variablen zu erklären.
          *                       Bei der linearen Regression wird dabei ein lineares Modell angenommen.
          *  Aktivierungsfunktion:= Sie macht aus einem linearen Wert einen nicht linearen Wert
+         *  rekurrentes Netz:= Rückgekoppeltes Netz
          */
         NeuralNet nn= new NeuralNet(4,3,3,3);
 

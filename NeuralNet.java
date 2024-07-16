@@ -13,9 +13,8 @@ public class NeuralNet {
      * @post global <perceptronsPerLayer> got defined.
      * @post global <edges> got defined.
      * @throws IllegalArgumentException Network needs to contain at least 2 elements(input-/output-layer).*/
-    public NeuralNet(int... layersPerceptrons)
-            throws IllegalArgumentException {
-
+    public NeuralNet(int... layersPerceptrons) throws IllegalArgumentException {
+        // TODO: 15.07.2024 Initialize a bias-perceptron to every layer except output-layer.
         final byte TWO= 2;
         if(layersPerceptrons.length<TWO)
             throw new IllegalArgumentException("Network needs to contain at least 2 elements(input-/output-layer).");
@@ -98,8 +97,6 @@ public class NeuralNet {
         for(int i=O; i< output.size(); ++i) {
             output.get(i).delta= sigDerivation.calc(output.get(i).sum)* lossFunc.calc(target.get(i), output.get(i).output);
         }
-
-        int LAYER_ID= edges.size()-ONE;
 
         //Calc remaining layers <delta>
         for(int i=edges.size()-ONE; i>(-ONE); --i) {
