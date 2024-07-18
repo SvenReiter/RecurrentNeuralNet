@@ -14,7 +14,7 @@ public class Start {
         Func activationFunc= x-> (float)(1 / (1 + Math.exp(-x[0])));
         nn.forward( activationFunc,
                     nn.getEdges(),
-                    nn.getPerceptronsPerLayer(),
+                    nn.getPerceptrons(),
                     Arrays.asList(0.1f, 0.2f, 0.3f, 0.4f));
 
         Func lossFunc= (x)-> (float)Math.pow((x[0]-x[1]), 2);
@@ -22,7 +22,7 @@ public class Start {
         Func sigDx = x-> (sig.calc(x)* (1-sig.calc(x)));
         Func deltaLearning= x-> (x[0]* x[1]* x[2]);
         nn.backpropagate(   sigDx, deltaLearning, lossFunc,
-                            nn.getPerceptronsPerLayer().get(nn.getPerceptronsPerLayer().size()-1),
+                            nn.getPerceptrons().get(nn.getPerceptrons().size()-1),
                             nn.getEdges(),
                             Arrays.asList(0.4f, 0.3f, 0.2f, 0.1f));
     }

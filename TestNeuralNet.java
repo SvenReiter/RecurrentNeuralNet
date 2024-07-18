@@ -33,10 +33,10 @@ public class TestNeuralNet {
         NeuralNet nn= new NeuralNet(edges, perceptronsPerLayer);
         nn.forward(x-> (float)(1 / (1 + Math.exp(-x[0]))),
                 nn.getEdges(),
-                nn.getPerceptronsPerLayer(),
+                nn.getPerceptrons(),
                 Arrays.asList(0.5f, 0.6f));
 
-        assertEquals(nn.getPerceptronsPerLayer().get(1).get(0).sum, 0.83, DELTA);
+        assertEquals(nn.getPerceptrons().get(1).get(0).sum, 0.83, DELTA);
     }
 
     @Test
@@ -77,18 +77,18 @@ public class TestNeuralNet {
         NeuralNet nn= new NeuralNet(edges, perceptronsPerLayer);
         nn.forward(sig,
                 nn.getEdges(),
-                nn.getPerceptronsPerLayer(),
+                nn.getPerceptrons(),
                 Arrays.asList(0.2f, 0.3f, 0.4f));
 
-        assertEquals(nn.getPerceptronsPerLayer().get(1).get(0).sum, 0.61, DELTA);
-        assertEquals(nn.getPerceptronsPerLayer().get(1).get(1).sum, 0.54, DELTA);
+        assertEquals(nn.getPerceptrons().get(1).get(0).sum, 0.61, DELTA);
+        assertEquals(nn.getPerceptrons().get(1).get(1).sum, 0.54, DELTA);
 
-        assertEquals(nn.getPerceptronsPerLayer().get(2).get(0).sum, 0.44872004, DELTA);
-        assertEquals(nn.getPerceptronsPerLayer().get(2).get(1).sum, 0.32235756, DELTA);
+        assertEquals(nn.getPerceptrons().get(2).get(0).sum, 0.44872004, DELTA);
+        assertEquals(nn.getPerceptrons().get(2).get(1).sum, 0.32235756, DELTA);
 
-        assertEquals(nn.getPerceptronsPerLayer().get(3).get(0).sum, 0.54321417, DELTA);
+        assertEquals(nn.getPerceptrons().get(3).get(0).sum, 0.54321417, DELTA);
 
-        assertEquals(nn.getPerceptronsPerLayer().get(3).get(0).output, 0.6325598, DELTA);
+        assertEquals(nn.getPerceptrons().get(3).get(0).output, 0.6325598, DELTA);
     }
 
     @Test
@@ -131,42 +131,43 @@ public class TestNeuralNet {
         NeuralNet nn= new NeuralNet(edges, perceptronsPerLayer);
         nn.forward( sig,
                 nn.getEdges(),
-                nn.getPerceptronsPerLayer(),
+                nn.getPerceptrons(),
                 Arrays.asList(1f, 0.7f, 0.6f));
 
-        final double DELTA= 1e-3;
-        assertEquals(nn.getPerceptronsPerLayer().get(2).get(0).output, 0.655, DELTA);
-        assertEquals(nn.getPerceptronsPerLayer().get(2).get(1).output, 0.55, DELTA);
+        assertEquals(nn.getPerceptrons().get(2).get(0).output, 0.6546592, DELTA);
+        assertEquals(nn.getPerceptrons().get(2).get(1).output, 0.5499865, DELTA);
 
         nn.backpropagate(sigDx, deltaLearning, lossFunc,
-                nn.getPerceptronsPerLayer().get(nn.getPerceptronsPerLayer().size()-1),
+                nn.getPerceptrons().get(nn.getPerceptrons().size()-1),
                 nn.getEdges(), Arrays.asList(0.9f, 0.2f));
 
-        assertEquals(nn.getPerceptronsPerLayer().get(2).get(0).delta, 0.0554667897522, DELTA);
-        assertEquals(nn.getPerceptronsPerLayer().get(2).get(1).delta, -0.08662214130163193, DELTA);
+        assertEquals(nn.getPerceptrons().get(2).get(0).delta, 0.0554667897522, DELTA);
+        assertEquals(nn.getPerceptrons().get(2).get(1).delta, -0.0866221413016, DELTA);
 
-        assertEquals(nn.getEdges().get(1).get(1).to.delta, 0.055, DELTA);
-        assertEquals(nn.getEdges().get(1).get(5).to.delta, -0.087, DELTA);
+        assertEquals(nn.getEdges().get(1).get(1).to.delta, 0.0554667897522, DELTA);
+        assertEquals(nn.getEdges().get(1).get(5).to.delta, -0.0866221413016, DELTA);
 
         int LAYER_ID= nn.getEdges().size()-1;
 
-        assertEquals(edges.get(LAYER_ID).get(0).weight, 0.255, DELTA);
-        assertEquals(edges.get(LAYER_ID).get(1).weight, 0.442, DELTA);
-        assertEquals(edges.get(LAYER_ID).get(2).weight, 0.325, DELTA);
-        assertEquals(edges.get(LAYER_ID).get(3).weight, 0.013, DELTA);
-        assertEquals(edges.get(LAYER_ID).get(4).weight, -0.466, DELTA);
+        assertEquals(edges.get(LAYER_ID).get(0).weight, 0.2554667897522, DELTA);
+        assertEquals(edges.get(LAYER_ID).get(1).weight, 0.44222286838, DELTA);
+        assertEquals(edges.get(LAYER_ID).get(2).weight, 0.3249600555, DELTA);
+        assertEquals(edges.get(LAYER_ID).get(3).weight, 0.01338586984, DELTA);
+        assertEquals(edges.get(LAYER_ID).get(4).weight, -0.465948273, DELTA);
         assertEquals(edges.get(LAYER_ID).get(5).weight, 0.861, DELTA);
+                                                                                              //f'(netzinput bzw. <sum>)*(Summe über Richtung Output verlaufende Kanten zu nächstem Layer(PerzeptronDelta*KantenGewicht))
+                                                                                              //bei der Rechnung müssen die ursprünglichen Gewichte verwendet werden
+        assertEquals(nn.getEdges().get(1).get(1).from.delta, 0.01032732018, DELTA);     // = f'(1.1600001) * (0.0554667897522*0.4+(-0.0866221413016*(-0.4))
+        assertEquals(nn.getEdges().get(1).get(2).from.delta, -0.01517768905, DELTA);    // = f'(-0.19999999) * (0.0554667897522*0.3+(-0.0866221413016*(0.9))
 
-        assertEquals(nn.getEdges().get(1).get(1).from.delta, 0.010367614, DELTA);
-        assertEquals(nn.getEdges().get(1).get(2).from.delta, -0.015399089, DELTA);
-
+        //Delta-Lernregel   ->  deltaLearning: weight+= (<ETA>(1) * <to.delta> * <from.output>)
         LAYER_ID--;
-        assertEquals(edges.get(LAYER_ID).get(0).weight, 0.3+0.010367614, DELTA);
-        assertEquals(edges.get(LAYER_ID).get(1).weight, 0.8+0.0072573298, DELTA);
-        assertEquals(edges.get(LAYER_ID).get(2).weight, 0.5+0.006220569, DELTA);
-        assertEquals(edges.get(LAYER_ID).get(3).weight, -0.2-0.015399089, DELTA);
-        assertEquals(edges.get(LAYER_ID).get(4).weight, -0.6-0.010779362, DELTA);
-        assertEquals(edges.get(LAYER_ID).get(5).weight, 0.7-0.009239454, DELTA);
+        assertEquals(edges.get(LAYER_ID).get(0).weight, 0.3+0.01032732018, DELTA);  //0.3+= <ETA>*<toDelta>*<fromOutput>= (1)*0.01032732018*1(bias)
+        assertEquals(edges.get(LAYER_ID).get(1).weight, 0.8+0.007229124, DELTA);   //0.8+= <ETA>*<toDelta>*<fromOutput>= (1)*0.01032732*0.7
+        assertEquals(edges.get(LAYER_ID).get(2).weight, 0.5+0.006196392, DELTA);    //0.5+= <ETA>*<toDelta>*<fromOutput>= (1)*0.01032732*0.6
+        assertEquals(edges.get(LAYER_ID).get(3).weight, -0.2-0.01517768905, DELTA);   //-0.2+= <ETA>*<toDelta>*<fromOutput>= (1)*-0.01517768905*1(bias)
+        assertEquals(edges.get(LAYER_ID).get(4).weight, -0.6-0.01062438233, DELTA);   //-0.6+= <ETA>*<toDelta>*<fromOutput>= (1)*-0.01517768905*0.7
+        assertEquals(edges.get(LAYER_ID).get(5).weight, 0.7-0.00910661343, DELTA);    //0.7+= <ETA>*<toDelta>*<fromOutput>= (1)*-0.01517768905*0.6
     }
 
     @Test
@@ -209,25 +210,25 @@ public class TestNeuralNet {
         NeuralNet nn= new NeuralNet(edges, perceptronsPerLayer);
         nn.forward( sig,
                 nn.getEdges(),
-                nn.getPerceptronsPerLayer(),
+                nn.getPerceptrons(),
                 Arrays.asList(1f, 0.7f, 0.6f));
 
-        final float preResult_hA= nn.getPerceptronsPerLayer().get(2).get(0).output;
-        final float preResult_hB= nn.getPerceptronsPerLayer().get(2).get(1).output;
+        final float preResult_hA= nn.getPerceptrons().get(2).get(0).output;
+        final float preResult_hB= nn.getPerceptrons().get(2).get(1).output;
         final float TARGET_oA= 0.9f, TARGET_oB= 0.2f;
         nn.backpropagate(sigDx, deltaLearning, lossFunc,
-                nn.getPerceptronsPerLayer().get(nn.getPerceptronsPerLayer().size()-1),
+                nn.getPerceptrons().get(nn.getPerceptrons().size()-1),
                 nn.getEdges(), Arrays.asList(TARGET_oA, TARGET_oB));
 
         nn.forward( sig,
                 nn.getEdges(),
-                nn.getPerceptronsPerLayer(),
+                nn.getPerceptrons(),
                 Arrays.asList(1f, 0.7f, 0.6f));
 
         // tests whether trained output is closer to target than previous output
         Assertions.assertTrue(
-    Math.abs(TARGET_oA-preResult_hA)>Math.abs(TARGET_oA-nn.getPerceptronsPerLayer().get(2).get(0).output) &&
-            Math.abs(TARGET_oB-preResult_hB)>Math.abs(TARGET_oB-nn.getPerceptronsPerLayer().get(2).get(1).output));
+    Math.abs(TARGET_oA-preResult_hA)>Math.abs(TARGET_oA-nn.getPerceptrons().get(2).get(0).output) &&
+            Math.abs(TARGET_oB-preResult_hB)>Math.abs(TARGET_oB-nn.getPerceptrons().get(2).get(1).output));
     }
 
     @Test
@@ -282,13 +283,33 @@ public class TestNeuralNet {
         NeuralNet nn= new NeuralNet(edges, perceptronsPerLayer);
         nn.forward( sig,
                     nn.getEdges(),
-                    nn.getPerceptronsPerLayer(),
+                    nn.getPerceptrons(),
                     Arrays.asList(0.5f, 0.7f, 0.9f));
 
-        assertEquals(nn.getPerceptronsPerLayer().get(3).get(0).output, 0.64928, DELTA);
-        assertEquals(nn.getPerceptronsPerLayer().get(3).get(1).output, 0.67615, DELTA);
-        assertEquals(nn.getPerceptronsPerLayer().get(3).get(2).output, 0.64658, DELTA);
-        assertEquals(nn.getPerceptronsPerLayer().get(3).get(3).output, 0.67822, DELTA);
+        assertEquals(nn.getPerceptrons().get(3).get(0).output, 0.64928, DELTA);
+        assertEquals(nn.getPerceptrons().get(3).get(1).output, 0.67615, DELTA);
+        assertEquals(nn.getPerceptrons().get(3).get(2).output, 0.64658, DELTA);
+        assertEquals(nn.getPerceptrons().get(3).get(3).output, 0.67822, DELTA);
+
+        final float preResult_hA= nn.getPerceptrons().get(3).get(0).output;
+        final float preResult_hB= nn.getPerceptrons().get(3).get(1).output;
+        final float preResult_hC= nn.getPerceptrons().get(3).get(2).output;
+        final float preResult_hD= nn.getPerceptrons().get(3).get(3).output;
+        final float TARGET_oA= 0.9f, TARGET_oB= 0.3f, TARGET_oC= 0.9f, TARGET_oD= 0.3f;
+        nn.backpropagate(   sigDx, deltaLearning, lossFunc,
+                            nn.getPerceptrons().get(nn.getPerceptrons().size()-1),
+                            nn.getEdges(), Arrays.asList(TARGET_oA, TARGET_oB, TARGET_oC, TARGET_oD));
+
+        nn.forward( sig,
+                    nn.getEdges(),
+                    nn.getPerceptrons(),
+                    Arrays.asList(0.5f, 0.7f, 0.9f));
+
+        Assertions.assertTrue(
+                Math.abs(TARGET_oA-preResult_hA)>Math.abs(TARGET_oA-nn.getPerceptrons().get(3).get(0).output) &&
+                        Math.abs(TARGET_oB-preResult_hB)>Math.abs(TARGET_oB-nn.getPerceptrons().get(3).get(1).output) &&
+                        Math.abs(TARGET_oC-preResult_hC)>Math.abs(TARGET_oC-nn.getPerceptrons().get(3).get(2).output) &&
+                        Math.abs(TARGET_oD-preResult_hD)>Math.abs(TARGET_oD-nn.getPerceptrons().get(3).get(3).output));
     }
 
     @Test
@@ -335,16 +356,16 @@ public class TestNeuralNet {
         NeuralNet nn= new NeuralNet(edges, perceptronsPerLayer);
         nn.forward( sig,
                     nn.getEdges(),
-                    nn.getPerceptronsPerLayer(),
+                    nn.getPerceptrons(),
                     Arrays.asList(0.5f, 0.7f, 0.9f));
 
         nn.addBias();
-        assertEquals(nn.getPerceptronsPerLayer().get(0).size(), 4);
-        assertTrue(nn.getPerceptronsPerLayer().get(0).get(0).isBias);
-        assertEquals(nn.getPerceptronsPerLayer().get(1).size(), 3);
-        assertTrue(nn.getPerceptronsPerLayer().get(1).get(0).isBias);
-        assertEquals(nn.getPerceptronsPerLayer().get(2).size(), 4);
-        assertTrue(nn.getPerceptronsPerLayer().get(2).get(0).isBias);
-        assertEquals(nn.getPerceptronsPerLayer().get(3).size(), 2);
+        assertEquals(nn.getPerceptrons().get(0).size(), 4);
+        assertTrue(nn.getPerceptrons().get(0).get(0).isBias);
+        assertEquals(nn.getPerceptrons().get(1).size(), 3);
+        assertTrue(nn.getPerceptrons().get(1).get(0).isBias);
+        assertEquals(nn.getPerceptrons().get(2).size(), 4);
+        assertTrue(nn.getPerceptrons().get(2).get(0).isBias);
+        assertEquals(nn.getPerceptrons().get(3).size(), 2);
     }
 }

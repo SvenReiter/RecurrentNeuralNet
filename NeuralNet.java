@@ -134,6 +134,7 @@ public class NeuralNet {
             }
         }
 
+        //todo Delta-Lernregel nachvollziehen
         for(List<Edge> eL: edges) {
             for(Edge e: eL) {
                 e.weight += deltaLearning.calc(e.to.delta, e.from.output);
@@ -144,7 +145,10 @@ public class NeuralNet {
     public List<List<Edge>> getEdges() {
         return edges;
     }
-    public List<List<Perceptron>> getPerceptronsPerLayer() {
+
+    /**
+     * @return a sequence(layers) of sequence(perceptrons) */
+    public List<List<Perceptron>> getPerceptrons() {
         return perceptronsPerLayer;
     }
 }
