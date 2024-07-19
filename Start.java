@@ -8,6 +8,12 @@ public class Start {
          *                       Bei der linearen Regression wird dabei ein lineares Modell angenommen.
          *  Aktivierungsfunktion:= Sie macht aus einem linearen Wert einen nicht linearen Wert
          *  rekurrentes Netz:= Rückgekoppeltes Netz
+         *  Gradientenabstiegsverfahren:    Gradient:= bezeichnet den Verlauf der Änderung einer bestimmten Größe.
+         *                                  Eine Optimierungsmethode um das Minimum einer Funktion zu finden. Indem es
+         *                                  iterativ in die Richtung des steilsten Abstiegs der Funktion fortschreitet.
+         *                                  Mit Ziel die Kostenfunktion/Verlustfunktion zu minimieren.
+         *                                  Die Schrittweite/Lernrate/Eta bestimmt die Schrittgröße in Richtung des
+         *                                  steilsten Abstiegs.
          */
         NeuralNet nn= new NeuralNet(4,3,3,3);
 

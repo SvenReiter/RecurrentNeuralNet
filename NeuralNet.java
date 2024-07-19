@@ -113,6 +113,8 @@ public class NeuralNet {
     }
 
     /**
+     * @param sigDerivation
+     * @param deltaLearning
      * @param lossFunc The loss function to measure the fault of the predictions and the actual outputs.
      * @param edges To not enter global address-room, on referencing the edges.
      * @param target The targeting values for output layers <Perceptron.sum>s.  */
@@ -134,7 +136,6 @@ public class NeuralNet {
             }
         }
 
-        //todo Delta-Lernregel nachvollziehen
         for(List<Edge> eL: edges) {
             for(Edge e: eL) {
                 e.weight += deltaLearning.calc(e.to.delta, e.from.output);
