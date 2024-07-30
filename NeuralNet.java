@@ -54,7 +54,7 @@ public class NeuralNet {
     public void addBias() {
         final byte ONE= (byte)1, O= (byte)0;
         final Perceptron bias= new Perceptron();
-        bias.sum= ONE;
+        bias.input = ONE;
         bias.output= ONE;
         bias.isBias= true;
         for(int l=O; l<perceptronsPerLayer.size()-ONE; ++l) {
@@ -88,25 +88,25 @@ public class NeuralNet {
         final byte O= (byte)0;
         for(List<Edge> l: edges) {
             for (Edge e : l) {
-                e.to.sum = O;
+                e.to.input = O;
                 e.to.output = O;
             }
         }
 
         for(int i=O; i<input.size(); ++i) {
             if(!perceptronsPerLayer.get(O).get(i).isBias) {
-                perceptronsPerLayer.get(O).get(i).sum = input.get(i);
-                perceptronsPerLayer.get(O).get(i).output = perceptronsPerLayer.get(O).get(i).sum;
+                perceptronsPerLayer.get(O).get(i).input = input.get(i);
+                perceptronsPerLayer.get(O).get(i).output = perceptronsPerLayer.get(O).get(i).input;
             }
         }
 
         for(List<Edge> l: edges) {
             for (Edge e : l) {
-                e.to.sum+= e.from.output* e.weight;
+                e.to.input += e.from.output* e.weight;
             }
             for (Edge e : l) {
                 if(Float.compare(e.to.output, O)== O) {
-                    e.to.output= activationFunc.calc(e.to.sum);
+                    e.to.output= activationFunc.calc(e.to.input);
                 }
             }
         }
@@ -116,6 +116,7 @@ public class NeuralNet {
      * @param sigDerivation
      * @param deltaLearning
      * @param lossFunc The loss function to measure the fault of the predictions and the actual outputs.
+     * @param output To not enter global address-room, on referencing the output-layers List<Perceptron>.
      * @param edges To not enter global address-room, on referencing the edges.
      * @param target The targeting values for output layers <Perceptron.sum>s.  */
     public void backpropagate(Func sigDerivation, Func deltaLearning, Func lossFunc, List<Perceptron> output,
@@ -123,23 +124,22 @@ public class NeuralNet {
         final byte O= (byte)0, ONE= (byte)1;
         //Calc outputlayers <delta>
         for(int i=O; i< output.size(); ++i) {
-            output.get(i).delta= sigDerivation.calc(output.get(i).sum)* lossFunc.calc(target.get(i), output.get(i).output);
+            output.get(i).delta= sigDerivation.calc(output.get(i).input)* lossFunc.calc(target.get(i), output.get(i).output);
         }
 
-        //Calc remaining layers <delta>
         for(int i=edges.size()-ONE; i>(-ONE); --i) {
             for(Edge e: edges.get(i)) {
-                e.from.delta+= e.to.delta* e.weight;  //At first <delta> gets used to sum up (prevLayerDelta*weight)s
+                e.from.sum+= e.to.delta* (e.weight+ deltaLearning.calc(e.to.delta, e.from.output));     // --> e.weight+ deltaLearning.calc(e.to.delta, e.from.output)
             }
             for(Perceptron p: perceptronsPerLayer.get(i)) {
-                p.delta= sigDerivation.calc(p.sum)*p.delta;
+                p.delta= sigDerivation.calc(p.input)*p.sum;
             }
         }
 
         for(List<Edge> eL: edges) {
             for(Edge e: eL) {
-                e.weight += deltaLearning.calc(e.to.delta, e.from.output);
-            }
+                e.weight+= deltaLearning.calc(e.to.delta, e.from.output);                               // --> e.weight+= deltaLearning.calc(e.to.delta, e.from.output)
+            }                                                                                           //todo funktionsaufrufe reduzieren, so dass im Idealfall nur noch einmal deltaLearning.calc ausgeführt wird
         }
     }
 
