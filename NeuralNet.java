@@ -122,24 +122,21 @@ public class NeuralNet {
     public void backpropagate(Func sigDerivation, Func deltaLearning, Func lossFunc, List<Perceptron> output,
                               List<List<Edge>> edges, List<Float> target) {
         final byte O= (byte)0, ONE= (byte)1;
-        //Calc outputlayers <delta>
+
+        //Calc output-layer's <delta>
         for(int i=O; i< output.size(); ++i) {
             output.get(i).delta= sigDerivation.calc(output.get(i).input)* lossFunc.calc(target.get(i), output.get(i).output);
         }
 
+        //Calc other layer's <delta>
         for(int i=edges.size()-ONE; i>(-ONE); --i) {
             for(Edge e: edges.get(i)) {
-                e.from.sum+= e.to.delta* (e.weight+ deltaLearning.calc(e.to.delta, e.from.output));     // --> e.weight+ deltaLearning.calc(e.to.delta, e.from.output)
+                e.weight+= deltaLearning.calc(e.to.delta, e.from.output);
+                e.from.sum+= e.to.delta* e.weight;
             }
             for(Perceptron p: perceptronsPerLayer.get(i)) {
                 p.delta= sigDerivation.calc(p.input)*p.sum;
             }
-        }
-
-        for(List<Edge> eL: edges) {
-            for(Edge e: eL) {
-                e.weight+= deltaLearning.calc(e.to.delta, e.from.output);                               // --> e.weight+= deltaLearning.calc(e.to.delta, e.from.output)
-            }                                                                                           //todo funktionsaufrufe reduzieren, so dass im Idealfall nur noch einmal deltaLearning.calc ausgeführt wird
         }
     }
 
