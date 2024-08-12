@@ -17,6 +17,35 @@ public class TestNeuralNet {
     final Func deltaLearning= x-> (ETA* x[0]* x[1]);                                                                    //Delta-Lernregel                   x[0]:=aktivierungslevel(soll) x[1]:=aktivierungslevel(ist)
 
     @Test
+    void neuralNetTestA() {
+        NeuralNet nn= new NeuralNet(4,3,3,3);
+        nn.forward( sig,
+                    nn.getEdges(),
+                    nn.getPerceptrons(),
+                    Arrays.asList(0.1f, 0.2f, 0.3f, 0.4f));
+        float preResult_oA= nn.getPerceptrons().get(nn.getPerceptrons().size()-1).get(0).output;
+        float preResult_oB= nn.getPerceptrons().get(nn.getPerceptrons().size()-1).get(1).output;
+        float preResult_oC= nn.getPerceptrons().get(nn.getPerceptrons().size()-1).get(2).output;
+
+        List<Float> target= Arrays.asList(0.3f, 0.2f, 0.1f);
+        nn.backpropagate(   sigDx, deltaLearning, lossFunc,
+                            nn.getPerceptrons().get(nn.getPerceptrons().size()-1),
+                            nn.getEdges(),
+                            target);
+        nn.forward( sig,
+                nn.getEdges(),
+                nn.getPerceptrons(),
+                Arrays.asList(0.1f, 0.2f, 0.3f, 0.4f));
+        float TARGET_oA= nn.getPerceptrons().get(nn.getPerceptrons().size()-1).get(0).output;
+        float TARGET_oB= nn.getPerceptrons().get(nn.getPerceptrons().size()-1).get(1).output;
+        float TARGET_oC= nn.getPerceptrons().get(nn.getPerceptrons().size()-1).get(2).output;
+
+        Assertions.assertTrue(  Math.abs(TARGET_oA-preResult_oA) > Math.abs(TARGET_oA-nn.getPerceptrons().get(3).get(0).output) &&
+                                Math.abs(TARGET_oB-preResult_oB) > Math.abs(TARGET_oB-nn.getPerceptrons().get(3).get(1).output) &&
+                                Math.abs(TARGET_oC-preResult_oC) > Math.abs(TARGET_oC-nn.getPerceptrons().get(3).get(2).output));
+    }
+
+    @Test
     void forwardTestA() {
         List<List<Perceptron>> perceptronsPerLayer= new ArrayList<>();
         perceptronsPerLayer.add(new ArrayList<>());
