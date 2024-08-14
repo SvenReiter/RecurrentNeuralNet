@@ -114,31 +114,35 @@ public class NeuralNet {
     }
 
     /**
-     * @param sigDerivation
-     * @param deltaLearning
+     * @param activationFuncDx The derivative of used activation function in forwarding.
+     * @param learningRule To adjust <weight> regarding given <delta>
      * @param lossFunc The loss function to measure the fault of the predictions and the actual outputs.
      * @param output To not enter global address-room, on referencing the output-layers List<Perceptron>.
      * @param edges To not enter global address-room, on referencing the edges.
      * @param target The targeting values for output layers <Perceptron.sum>s.
-     * @post edges weights have been refined to achieve <target> more clearly. */
-    public void backpropagate(Func sigDerivation, Func deltaLearning, Func lossFunc, List<Perceptron> output,
-                              List<List<Edge>> edges, List<Float> target) {
+     * @post edges weights have been refined to achieve <target> more clearly.
+     * @throws IllegalArgumentException when Output-Layer's size doesn't match size of <target>. */
+    public void backpropagate(Func activationFuncDx, Func learningRule, Func lossFunc, List<Perceptron> output,
+                              List<List<Edge>> edges, List<Float> target) throws IllegalArgumentException {
         final byte O= (byte)0, ONE= (byte)1;
+
+        if(output.size()!= target.size())
+            throw new IllegalArgumentException("Output-Layer's size doesn't match size of <target>.");
 
         //Calc output-layer's <delta>
         for(int i=O; i< output.size(); ++i) {
             output.get(i).delta=
-                    sigDerivation.calc(output.get(i).input)* lossFunc.calc(target.get(i), output.get(i).output);
+                    activationFuncDx.calc(output.get(i).input)* lossFunc.calc(target.get(i), output.get(i).output);
         }
 
         //Calc other layer's <delta>
         for(int i=edges.size()-ONE; i>(-ONE); --i) {
             for(Edge e: edges.get(i)) {
-                e.weight+= deltaLearning.calc(e.to.delta, e.from.output);                                               //optimize <weight>
-                e.from.sum+= e.to.delta* e.weight;
+                e.weight+= learningRule.calc(e.to.delta, e.from.output);                                                //optimize <weight>
+                e.from.delta+= e.to.delta* e.weight;
             }
             for(Perceptron p: perceptronsPerLayer.get(i)) {
-                p.delta= sigDerivation.calc(p.input)*p.sum;
+                p.delta= activationFuncDx.calc(p.input)*p.delta;
             }
         }
     }
