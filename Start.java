@@ -5,7 +5,10 @@ public class Start {
     public static void main(String[] args) {
         NeuralNet nn= new NeuralNet(4,3,3,3);
         /*
-         *  Rekurrentes Netz:= Rückgekoppeltes Netz
+         *  RNN:= Als rekurrente bzw. rückgekoppelte neuronale Netze bezeichnet man neuronale Netze, die sich im
+         *        Gegensatz zu den Feedforward-Netzen durch Verbindungen von Neuronen einer Schicht zu Neuronen
+         *        derselben oder einer vorangegangenen Schicht auszeichnen.
+         *  Regression:= Beziehungen zwischen einer abhängigen und einer/mehreren unabhängigen Variablen zu modellieren.
          *  Lineare Regression: Spezialfall der Regressionsanalyse, mit dem versucht wird eine beobachtete
          *                      abhängige Variable durch eine oder mehrere unabhängige Variablen zu erklären.
          *                      Bei der linearen Regression wird dabei ein lineares Modell angenommen.
@@ -23,6 +26,14 @@ public class Start {
          *                               Mit Ziel die Kostenfunktion/Verlustfunktion zu minimieren.
          *                               Die Schrittweite/Lernrate/Eta bestimmt die Schrittgröße in Richtung des
          *                               steilsten Abstiegs.
+         *  CNN:= Grundsätzlich besteht die Struktur eines klassischen Convolutional (diskrete Faltung:= mathematischer
+         *        Operator, der für zwei Funktionen f und g eine dritte Funktion f*g liefert; Convolutional-
+         *        Operation:= Filtering Operation) Neural Networks aus einem oder mehreren
+         *        Convolutional Layer(=Filter:= Feature-Detectors; Result: Feature-Map), gefolgt von einem
+         *        Pooling(zusammenbringen; hier werden überflüssige Informationen verworfen; zB. pooling(4px->1px)
+         *        Max(höchsten Wert der 4 Pixel abbilden)-/Average(Durchschnittswert der 4 Pixel abbilden)-
+         *        pooling: Positions-Invariante Merkmalserkennung) -Layer.
+         *        Angegeben werden muss die Anzahl/Größe der Filter die pro Convolutional-Layer eingesetzt werden soll.
          */
         Func activationFunc= x-> (float)(1 / (1 + Math.exp(-x[0])));
         nn.forward( activationFunc,

@@ -13,8 +13,7 @@ public class NeuralNet {
      * @post global <edges> got defined.
      * @throws IllegalArgumentException Network needs to contain at least 2 elements(input-/output-layer).*/
     public NeuralNet(int... layersPerceptrons) throws IllegalArgumentException {
-        final byte TWO= (byte)2;
-        if(layersPerceptrons.length<TWO)
+        if(layersPerceptrons.length<2)
             throw new IllegalArgumentException("Network needs to contain at least 2 elements(input-/output-layer).");
 
         final byte ONE= (byte)1, O= (byte)0;
@@ -148,7 +147,7 @@ public class NeuralNet {
     }
 
     /**
-     * @return a sequence(layers) of sequence(perceptrons) */
+     * @return sequence(of layers as of sequence(of perceptrons)).  */
     public List<List<Perceptron>> getPerceptrons() {
         return perceptronsPerLayer;
     }
